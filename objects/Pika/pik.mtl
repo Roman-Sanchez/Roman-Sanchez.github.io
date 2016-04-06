@@ -1,0 +1,90 @@
+# Blender MTL File: 'None'
+# Material Count: 8
+
+newmtl PikachuDh_PikachuDh.png
+Ns 94.117647
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:\Users\gabis\WebStorm\3DPalletTown3\objects\Pikachu\PikachuDh.png
+
+newmtl PikachuDh_PikachuDh.png.001
+Ns 94.117647
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:\Users\gabis\WebStorm\3DPalletTown3\objects\Pikachu\PikachuDh.png
+
+newmtl PikachuEyeDh_PikachuEyeDh.png
+Ns 94.117647
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:\Users\gabis\WebStorm\3DPalletTown3\objects\Pikachu\PikachuEyeDh.png
+
+newmtl PikachuEyeDh_PikachuEyeDh.png.001
+Ns 94.117647
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:\Users\gabis\WebStorm\3DPalletTown3\objects\Pikachu\PikachuEyeDh.png
+
+newmtl PikachuHohoDh_PikachuHohoDh.png
+Ns 94.117647
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:\Users\gabis\WebStorm\3DPalletTown3\objects\Pikachu\PikachuHohoDh.png
+
+newmtl PikachuHohoDh_PikachuHohoDh.png.001
+Ns 94.117647
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:\Users\gabis\WebStorm\3DPalletTown3\objects\Pikachu\PikachuHohoDh.png
+
+newmtl PikachuMouthDh_PikachuMouthDh.png
+Ns 94.117647
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:\Users\gabis\WebStorm\3DPalletTown3\objects\Pikachu\PikachuMouthDh.png
+
+newmtl PikachuMouthDh_PikachuMouthDh.png.001
+Ns 94.117647
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:\Users\gabis\WebStorm\3DPalletTown3\objects\Pikachu\PikachuMouthDh.png

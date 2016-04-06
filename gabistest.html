@@ -1,0 +1,429 @@
+<html>
+<head>
+    <title>template threejs</title>
+    <style>
+        body { margin: 0; }
+        canvas { width: 100%; height: 100% }
+    </style>
+</head>
+<body>
+<script src="three.js-master/build/three.min.js"></script>
+<script src='js/THREEx.KeyboardState.js'></script>
+<script src="js/loaders/DDSLoader.js"></script>
+<script src="js/loaders/MTLLoader.js"></script>
+<script src="js/loaders/OBJLoader.js"></script>
+<script src="js/loaders/OBJMTLLoader.js"></script>
+<script>
+    // Create scene and camera
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+    //var camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 100, 500 );
+
+    var keyboard = new THREEx.KeyboardState();
+    var clock = new THREE.Clock();
+    var bulbaBox;
+    var bulba2;
+    var lab;
+    var pika;
+    var ash;
+    var house;
+    var tempPB;
+    var tempPB2;
+
+    // Fog
+    //scene.fog = new THREE.FogExp2( 0xefd1b5, 0.002 );
+
+    // contains all the objects in the scene except that main character
+    var objectList = [];
+
+    // bounding box helper objects
+    var helperBoxes = [];
+
+    // list of all the box3s
+    var ObjectBoxes = [];
+
+    // define renderer
+
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    document.body.appendChild( renderer.domElement );
+
+    function init(){
+        console.log("Hello");
+        var ambientLight = new THREE.AmbientLight(0x404040);
+        scene.add(ambientLight);
+
+        var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.0 );
+        directionalLight.position.set( -1000, 100, 1000 );
+        directionalLight.castShadow = true;
+        scene.add( directionalLight );
+
+        // Leaving this here in case I need to reference it later. can be deleted whenever
+        // var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+        // var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+        // var cube = new THREE.Mesh( geometry, material );
+        // cube.position.y = 0.5;
+        // cube.castShadow = true;
+        // cube.receiveShadow = true;
+        // scene.add( cube );
+
+        var geometry2 = new THREE.PlaneGeometry(100, 100);
+        var material2 = new THREE.MeshBasicMaterial({color: 0x1100FF, side: THREE.DoubleSide});
+        var plane = new THREE.Mesh(geometry2, material2);
+        plane.receiveShadow = true;
+        plane.castShadow= true;
+        plane.position.y = 0;
+
+        // Rotate the plane to lay flat along the ground
+        plane.rotateX(90 * Math.PI / 180 );
+
+        //FLOOR
+        /**
+         *
+         *
+         var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
+         floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
+         floorTexture.repeat.set( 10, 10 );
+         var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+         var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
+         var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+         floor.position.y = -0.5;
+         floor.rotation.x = Math.PI / 2;
+         scene.add(floor);
+         */
+        var floorTexture = new THREE.ImageUtils.loadTexture('objects/images/grass.jpg');
+        floorTexture.wrapS = floorTexture.wrapT = THREE.MirroredRepeatWrapping;
+        floorTexture.repeat.set( 200, 200);
+        var floorMaterial = new THREE.MeshBasicMaterial({map: floorTexture, side: THREE.DoubleSide});
+        var floorGeometry = new THREE.PlaneGeometry(1000,1000,20,20);
+        var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        floor.receiveShadow = true;
+        floor.position.y = 0;
+        floor.rotation.x = Math.PI / 2;
+        scene.add(floor);
+
+        //camera.lookAt(cube);
+        camera.position.z = 5;
+        camera.position.y = 1;
+
+        // Skybox
+        var axes = new THREE.AxisHelper(100);
+        scene.add(axes);
+
+        var urls = ["objects/images/right.png", "objects/images/left.png", "objects/images/top.png",
+            "objects/images/bottom.png","objects/images/front.png","objects/images/back.png"];
+        var skyGeo = new THREE.CubeGeometry(1000, 600, 1000);
+        var materialArray = [];
+        for (var i = 0; i < 6; i++){
+            materialArray.push(new THREE.MeshBasicMaterial(
+                    {
+                        map: THREE.ImageUtils.loadTexture(urls[i]),
+                        side: THREE.BackSide
+                    }
+            ));
+        }
+        var skyMaterial = new THREE.MeshFaceMaterial(materialArray);
+        var skyBox = new THREE.Mesh(skyGeo, skyMaterial);
+        skyBox.position.y = 49.5;
+        scene.add(skyBox);
+
+        // Build trees
+        loadTrees();
+
+        pika = loadOBJ("objects/Pika/", "objects/Pika/", "untitled.obj","untitled.mtl", 9, 0.4, 5, {"x": 0.03, "y": 0.03,"z": 0.03});
+        bulbs = loadOBJ("objects/TestBulba/", "objects/TestBulba/", "Bulba.obj", "Bulba.mtl", 0, 0.4, 5, {"x": 3, "y": 3, "z":3});
+
+
+        tempPB = new THREE.Box3().setFromObject(pika);
+        tempPB2 = new THREE.Box3().setFromObject(pika);
+
+        house = loadOBJ("objects/House/", "objects/House/", "House.obj", "House.mtl", -100, -0.199, -100, {"x": 0.2, "y": 0.2, "z": 0.2});
+
+        lab = loadOBJ("objects/ElmPokemonLab/", "objects/ElmPokemonLab/", "Elm\ Pokemon\ Lab.obj", "ElmPokemonLab.mtl",
+                100, -1, -100, {"x": 0.2, "y": 0.2, "z": 0.2});
+
+        ash = loadOBJ("objects/PokeTrainer/", "objects/PokeTrainer/", "ash1.obj","ash1.mtl", 0, 0, 0, {"x": 0.25, "y": 0.25,"z": 0.25});
+
+
+        console.log(ash);
+        bulbaBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+        bulbaBox.setFromObject(ash);
+
+        scene.add(ash);
+        bulbaHelper = new THREE.BoundingBoxHelper( ash, 0xffffff );
+        scene.add( bulbaHelper );
+
+        // add all the objects created in the init function to the objectList variable
+        addOBJToList(bulbs);
+        addOBJToList(pika);
+        addOBJToList(house);
+        addOBJToList(lab);
+
+        // wrap all objects in box3
+        wrapObjects(objectList);
+
+        // add all objects to the scene
+        addToScene(objectList);
+
+    }
+
+    /**********************************************************
+     * takes the list of objects and adds them to the scene
+     ***********************************************************/
+    function addToScene(list){
+        for (var i = 0; i < list.length; i++){
+            scene.add(list[i]);
+        }
+    }
+    /***********************************************************
+     * Load all the trees that will bound the world.
+     ***********************************************************/
+    function loadTrees(){
+
+        // create the boundaries using trees
+        var objScale = {"x": 0.09, "y": 0.09, "z": 0.09};
+        for (var h = 0; h < 150; h += 7)
+        {
+            var num = 0;
+
+            if ((h % 2) == 0) {
+                num = -h;
+            }
+            else {
+                num = h;
+            }
+
+            var tree1 = loadOBJ("objects/N64Tree/","objects/N64Tree/","N64_Tree.obj", "N64_Tree.mtl", 150, 0, -h, objScale);
+            tree1.castShadow = true;
+            var tree2 = loadOBJ("objects/N64Tree/","objects/N64Tree/","N64_Tree.obj", "N64_Tree.mtl", -150, 0, h, objScale);
+            var tree3 = loadOBJ("objects/N64Tree/","objects/N64Tree/","N64_Tree.obj", "N64_Tree.mtl", -150, 0, -h, objScale);
+            var tree4 = loadOBJ("objects/N64Tree/","objects/N64Tree/","N64_Tree.obj", "N64_Tree.mtl", 150, 0, h, objScale);
+
+            var tree5 = loadOBJ("objects/N64Tree/","objects/N64Tree/","N64_Tree.obj", "N64_Tree.mtl", -h, 0, 150, objScale);
+            var tree6 = loadOBJ("objects/N64Tree/","objects/N64Tree/","N64_Tree.obj", "N64_Tree.mtl", -h, 0, -110, objScale);
+            var tree7 = loadOBJ("objects/N64Tree/","objects/N64Tree/","N64_Tree.obj", "N64_Tree.mtl", h, 0, -110, objScale);
+            var tree8 = loadOBJ("objects/N64Tree/","objects/N64Tree/","N64_Tree.obj", "N64_Tree.mtl", h, 0, 150, objScale);
+
+            // add all objects to the list of objects
+            addOBJToList(tree1);
+            addOBJToList(tree2);
+            addOBJToList(tree3);
+            addOBJToList(tree4);
+            addOBJToList(tree5);
+            addOBJToList(tree6);
+            addOBJToList(tree7);
+            addOBJToList(tree8);
+        }
+    }
+
+    /***********************************************************
+     * logs the loading process for each asset
+     ***********************************************************/
+    var onProgress = function ( xhr ) {
+        if ( xhr.lengthComputable ) {
+            var percentComplete = xhr.loaded / xhr.total * 100;
+            // console.log( Math.round(percentComplete, 2) + '% downloaded' );
+        }
+    };
+
+    /****************************************
+     * This method is not needed at this point, just need to change the way bulba2 is being loaded
+     * /
+     /***********************************************************
+     * Load the bulbasaur asset.
+     ***********************************************************/
+    function loadNewBulba() {
+        // load bulbasaur
+        var bulba = new THREE.Object3D();
+        var onError = function (xhr) {
+        };
+        THREE.Loader.Handlers.add(/\.dds$/i, new THREE.DDSLoader());
+        var mtlLoader = new THREE.MTLLoader();
+        mtlLoader.setBaseUrl('objects/TestBulba/');
+        mtlLoader.setPath('objects/TestBulba/');
+        mtlLoader.load('Bulba.mtl', function (materials) {
+            materials.preload();
+            var objLoader = new THREE.OBJLoader();
+            objLoader.setMaterials(materials);
+            objLoader.setPath('objects/TestBulba/');
+            objLoader.load('Bulba.obj', function (object) {
+                object.scale.set(3, 3, 3);
+                object.rotateOnAxis(new THREE.Vector3(0,1,0), 180 * Math.PI / 180);
+                object.position.set(0, 0.4, 5);
+                bulba.add(object);
+
+            }, onProgress, onError);
+        });
+        return bulba;
+    }
+
+    /***********************************************************
+     * Create an obj and map its textures using the mtl file
+     *
+     * @objBaseURL: file path to where the .obj is located
+     * @mtlBaseURL: file path to where the .mtl is located
+     * @objName:    name of the obj file
+     * @mtlName:    name of the mtl file
+     * @xpos:       x position
+     * @ypos:       y position
+     * @zpos:       z position
+     * @objScale:   map with scale values (x, y, z)
+     ***********************************************************/
+    function loadOBJ(objBaseURL, mtlBaseURL, objName, mtlName, xpos, ypos, zpos, objScale) {
+
+        // set the position to a default of zero if they are not passed in
+        if (xpos == null)
+            xpos = 0;
+
+        if (ypos == null)
+            ypos = 0;
+
+        if (zpos == null)
+            zpos = 0;
+
+        // if objscale is not provided it will set it to 1
+        if (objScale == null)
+            objScale = {"x": 1, "y": 1, "z": 1};
+
+        var object3D = new THREE.Object3D();
+        var onError = function (xhr) {
+        };
+        THREE.Loader.Handlers.add(/\.dds$/i, new THREE.DDSLoader());
+        var mtlLoader = new THREE.MTLLoader();
+        mtlLoader.setBaseUrl(mtlBaseURL);
+        mtlLoader.setPath(mtlBaseURL);
+        mtlLoader.load(mtlName, function (materials) {
+            materials.preload();
+            var objLoader = new THREE.OBJLoader();
+            objLoader.setMaterials(materials);
+            objLoader.setPath(objBaseURL);
+            objLoader.load(objName, function (object) {
+                object.scale.set(objScale["x"], objScale["y"], objScale["z"]);
+                object.position.set(xpos, ypos, zpos);
+                object3D.add(object);
+
+            }, onProgress, onError);
+        });
+        return object3D;
+    }
+
+    /**********************************************************
+     * used for movement
+     **********************************************************/
+    var move = function movement(){
+
+        // TODO: add collision detection here. If there is a collision, return from the function
+        // collision detection, not working currently
+        for (var i = 0; i < helperBoxes.length; i ++){
+            //console.log(bulbaBox);
+            //console.log(bulbaBox.intersectsBox(ObjectBoxes[i]));
+            if ( bulbaBox.intersectsBox(ObjectBoxes[i]) ){
+                console.log("Contact");
+                return;
+            }
+        }
+        var delta = clock.getDelta();
+        var rotateAngle = Math.PI / 2 * delta;
+        var speed = 0.5;
+
+        if( keyboard.pressed("W") ) {
+            ash.translateZ(-speed);
+        }
+
+        if( keyboard.pressed("S") ) {
+            ash.translateZ(speed);
+        }
+
+        // Create rotations to rotate the cube
+
+        if ( keyboard.pressed("A") )
+            ash.rotateOnAxis( new THREE.Vector3(0,1,0), rotateAngle);
+        if ( keyboard.pressed("D") )
+            ash.rotateOnAxis( new THREE.Vector3(0,1,0), -rotateAngle);
+
+        cameraMovement(ash);1
+    };
+
+    /***********************************************************
+     * Adjusts the camera based on user movement
+     ***********************************************************/
+    function cameraMovement(cube){
+
+        // 5 units behind and 3 units above the object
+        var relativeCameraOffset = new THREE.Vector3(0, 5, 10);
+
+        var cameraOffset = relativeCameraOffset.applyMatrix4(cube.matrixWorld);
+
+        camera.position.set(cameraOffset.x, cameraOffset.y, cameraOffset.z);
+
+        // face the object
+        camera.lookAt(cube.position);
+    }
+
+    /***********************************************************
+     * Takes the list of bounding helper boxes and adds them to the scene. Strictly for debugging help.
+     ***********************************************************/
+    function displayHelper(helperBoxes){
+        for (var i = 0; i < helperBoxes.length; i++){
+            helperBoxes[i].update();
+            scene.add(helperBoxes[i]);
+        }
+    }
+
+    // Was going to be a function for collision detection, may not use it anymore.
+    function collide(object){
+        for (var i = 0; i < box3Array.length; i++){
+            if(object.intersectsBox(box3Array[i]))
+            {
+                console.log("Collision");
+            }
+        }
+    };
+
+    /***********************************************************
+     * adds object to the objectList
+     ***********************************************************/
+    function addOBJToList(currObject){
+        objectList.push(currObject);
+    }
+
+    /***********************************************************
+     * wrap all the objects in the objectList with a Box3
+     ***********************************************************/
+    function wrapObjects(objectList){
+        var box = new THREE.Box3(new THREE.Vector3(0, 3, 0), new THREE.Vector3(0, 3, 0));
+
+        for (var i = 0; i < objectList.length; i++){
+            box.setFromObject(objectList[i]);
+            ObjectBoxes.push(box);
+            bbHelper = new THREE.BoundingBoxHelper( objectList[i], 0xffffff );
+            addHelperToList(bbHelper);
+        }
+    }
+
+    /***********************************************************
+     * Takes in a bounding box helper and adds it to the helperBoxes array
+     * @bbHelper: BoundingBoxHelper
+     ***********************************************************/
+    function addHelperToList(bbHelper){
+        helperBoxes.push(bbHelper);
+    }
+
+    /***********************************************************
+     * Render the scene
+     ***********************************************************/
+    var render = function () {
+        requestAnimationFrame( render );
+        displayHelper(helperBoxes);
+        bulbaHelper.update();
+        move();
+        renderer.shadowMap.enabled = true;
+        renderer.render(scene, camera);
+    };
+
+    init();
+    render();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+# Material file for charmander.obj
+
+newmtl mat_0_hitokage_0_0.tga
+	Ns 96
+	d 1
+	illum 2
+	Kd 1.0 1.0 1.0
+	Ks 0.0 0.0 0.0
+	Ka 0.0 0.0 0.0
+	map_Kd hitokage_0_0.png
+
+newmtl mat_1_hitokage_0_1.tga
+	Ns 96
+	d 1
+	illum 2
+	Kd 1.0 1.0 1.0
+	Ks 0.0 0.0 0.0
+	Ka 0.0 0.0 0.0
+	map_Kd hitokage_0_1.png
+
